@@ -70,6 +70,15 @@ MouseArea {
         height: parent.height
     }
 
+    /* Rectangle { // Not sure about this...
+        radius: Appearance.rounding.full
+        implicitWidth: parent.width + 10
+        implicitHeight: implicitWidth
+        anchors.centerIn: trayIcon
+        color: Appearance.colors.colLayer1
+        z: -1
+    } */
+
     Loader {
         active: Config.options.tray.monochromeIcons
         anchors.fill: trayIcon

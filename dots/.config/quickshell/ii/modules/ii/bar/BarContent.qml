@@ -16,6 +16,7 @@ Item { // Bar content region
     property var brightnessMonitor: Brightness.getMonitorForScreen(screen)
     property real useShortenedForm: (Appearance.sizes.barHellaShortenScreenWidthThreshold >= screen?.width) ? 2 : (Appearance.sizes.barShortenScreenWidthThreshold >= screen?.width) ? 1 : 0
     readonly property int centerSideModuleWidth: (useShortenedForm == 2) ? Appearance.sizes.barCenterSideModuleWidthHellaShortened : (useShortenedForm == 1) ? Appearance.sizes.barCenterSideModuleWidthShortened : Appearance.sizes.barCenterSideModuleWidth
+    property int barSpacing: 0
 
     component VerticalBarSeparator: Rectangle {
         Layout.topMargin: Appearance.sizes.baseBarHeight / 3
@@ -54,7 +55,7 @@ Item { // Bar content region
             top: parent.top
             bottom: parent.bottom
             left: parent.left
-            right: middleSection.left
+           
         }
         implicitWidth: leftSectionRowLayout.implicitWidth
         implicitHeight: Appearance.sizes.baseBarHeight
@@ -79,119 +80,157 @@ Item { // Bar content region
 
         RowLayout {
             id: leftSectionRowLayout
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 10
 
             LeftSidebarButton { // Left sidebar button
+                id: leftSidebarButton
                 Layout.alignment: Qt.AlignVCenter
                 Layout.leftMargin: Appearance.rounding.screenRounding
-                colBackground: barLeftSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
+                colBackground: barLeftSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : Appearance.colors.colLayer1
             }
 
-            ActiveWindow {
+            /* ActiveWindow { //? I dont think this is good?
                 visible: root.useShortenedForm === 0
                 Layout.rightMargin: Appearance.rounding.screenRounding
-                Layout.fillWidth: true
+                Layout.preferredWidth: 300 
                 Layout.fillHeight: true
-            }
+            } */
         }
     }
 
-    Row { // Middle section
-        id: middleSection
+    Row {
+        id: centerLeftSection
         anchors {
-            top: parent.top
-            bottom: parent.bottom
-            horizontalCenter: parent.horizontalCenter
+            left: barLeftSideMouseArea.right
+            verticalCenter: parent.verticalCenter
+            margins: 6
         }
-        spacing: 4
+        spacing: 6
 
-        BarGroup {
-            id: leftCenterGroup
+        BarContainer {
+            sourceComp: mediaWidget
+            Layout.fillWidth: true
             anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: root.centerSideModuleWidth
-
-            Resources {
-                alwaysShowAllResources: root.useShortenedForm === 2
-                Layout.fillWidth: root.useShortenedForm === 2
-            }
-
+            leftMost: true
+            rightMost: true
             Media {
+                id: mediaWidget
                 visible: root.useShortenedForm < 2
-                Layout.fillWidth: true
+                anchors.fill: parent
+                implicitWidth: 250
+                anchors.margins: 5
             }
         }
 
-        VerticalBarSeparator {
-            visible: Config.options?.bar.borderless
+        Resources {
+            id: resourcesWidget
+            alwaysShowAllResources: root.useShortenedForm === 2
+            Layout.fillWidth: root.useShortenedForm === 2
         }
 
-        BarGroup {
-            id: middleCenterGroup
-            anchors.verticalCenter: parent.verticalCenter
-            padding: workspacesWidget.widgetPadding
+        
+    }
 
-            Workspaces {
-                id: workspacesWidget
-                Layout.fillHeight: true
-                MouseArea {
-                    // Right-click to toggle overview
-                    anchors.fill: parent
-                    acceptedButtons: Qt.RightButton
+    VerticalBarSeparator {
+        visible: Config.options?.bar.borderless
+    }
 
-                    onPressed: event => {
-                        if (event.button === Qt.RightButton) {
-                            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
-                        }
+    BarContainer {
+        id: workspacesContainer
+
+        sourceComp: workspacesWidget
+        anchors.verticalCenter: parent.verticalCenter
+        Layout.fillWidth: true
+        anchors.centerIn: parent
+
+        rightMost: true
+        leftMost: true
+
+        Workspaces {
+            id: workspacesWidget
+            anchors.centerIn: parent
+            Layout.fillHeight: true
+            MouseArea {
+                // Right-click to toggle overview
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+
+                onPressed: event => {
+                    if (event.button === Qt.RightButton) {
+                        GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
                     }
                 }
             }
         }
+    }
 
-        VerticalBarSeparator {
-            visible: Config.options?.bar.borderless
+    VerticalBarSeparator {
+        visible: Config.options?.bar.borderless
+    }
+
+    Row {
+        anchors {
+            right: barRightSideMouseArea.left
+            verticalCenter: parent.verticalCenter
+            horizontalCenter: parent.horizontalCenter
+            margins: 6
         }
+        layoutDirection: Qt.RightToLeft
+        spacing: 6
 
-        MouseArea {
-            id: rightCenterGroup
+        Loader {
+            active: Config.options.bar.weather.enable
             anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: root.centerSideModuleWidth
-            implicitHeight: rightCenterGroupContent.implicitHeight
-
-            onPressed: {
-                GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
-            }
-
-            BarGroup {
-                id: rightCenterGroupContent
-                anchors.fill: parent
-
-                ClockWidget {
-                    showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.fillWidth: true
-                }
-
-                UtilButtons {
-                    visible: (Config.options.bar.verbose && root.useShortenedForm === 0)
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
-                BatteryIndicator {
-                    visible: (root.useShortenedForm < 2 && Battery.available)
-                    Layout.alignment: Qt.AlignVCenter
+            width: active ? item.implicitWidth : 0
+            height: active ? item.implicitHeight : 0
+            sourceComponent: BarContainer {
+                sourceComp: weatherBar
+                leftMost: true
+                rightMost: true
+                WeatherBar {
+                    anchors.centerIn: parent
+                    id: weatherBar
                 }
             }
         }
+
+        ClockWidget {
+            id: clockWidget
+            
+            showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)                        
+        }
+
+        UtilButtons {
+            id: utilButtons
+            anchors.verticalCenter: parent.verticalCenter
+            visible: (Config.options.bar.verbose && root.useShortenedForm === 0)
+        }
+
+        BarContainer {
+            id: batteryContainer
+            sourceComp: batteryIndicator
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
+            visible: sourceComp.visible
+            BatteryIndicator {
+                id: batteryIndicator
+                anchors.centerIn: parent
+                visible: (root.useShortenedForm < 2 && Battery.available)
+                Layout.alignment: Qt.AlignVCenter
+            }
+        }
+        
     }
 
     FocusedScrollMouseArea { // Right side | scroll to change volume
         id: barRightSideMouseArea
-
+        z: 0
         anchors {
             top: parent.top
             bottom: parent.bottom
-            left: middleSection.right
+            //left: batteryContainer.right
             right: parent.right
         }
         implicitWidth: rightSectionRowLayout.implicitWidth
@@ -233,7 +272,7 @@ Item { // Bar content region
                 implicitHeight: indicatorsRowLayout.implicitHeight + 5 * 2
 
                 buttonRadius: Appearance.rounding.full
-                colBackground: barRightSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
+                colBackground: barRightSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : Appearance.colors.colLayer1
                 colBackgroundHover: Appearance.colors.colLayer1Hover
                 colRipple: Appearance.colors.colLayer1Active
                 colBackgroundToggled: Appearance.colors.colSecondaryContainer
@@ -250,6 +289,7 @@ Item { // Bar content region
                     GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
                 }
 
+                
                 RowLayout {
                     id: indicatorsRowLayout
                     anchors.centerIn: parent
@@ -323,19 +363,12 @@ Item { // Bar content region
             }
 
             Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredWidth: 10
             }
 
-            // Weather
-            Loader {
-                Layout.leftMargin: 4
-                active: Config.options.bar.weather.enable
+            
 
-                sourceComponent: BarGroup {
-                    WeatherBar {}
-                }
-            }
+            
         }
     }
 }

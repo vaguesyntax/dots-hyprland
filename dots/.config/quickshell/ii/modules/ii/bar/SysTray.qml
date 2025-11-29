@@ -80,6 +80,7 @@ Item {
             background.implicitWidth: 24
             background.implicitHeight: 24
             background.anchors.centerIn: this
+            colBackground: Appearance.colors.colLayer1
             colBackgroundToggled: Appearance.colors.colSecondaryContainer
             colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
             colRippleToggled: Appearance.colors.colSecondaryContainerActive

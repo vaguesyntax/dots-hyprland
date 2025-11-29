@@ -173,17 +173,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "content_cut"
                 text: Translation.tr("Screen snip")
-                checked: Config.options.bar.utilButtons.showScreenSnip
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "screenSnip")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showScreenSnip = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "screenSnip")[0].visible = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "colorize"
                 text: Translation.tr("Color picker")
-                checked: Config.options.bar.utilButtons.showColorPicker
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "colorPicker")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showColorPicker = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "colorPicker")[0].visible = checked;
                 }
             }
         }
@@ -192,17 +192,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "keyboard"
                 text: Translation.tr("Keyboard toggle")
-                checked: Config.options.bar.utilButtons.showKeyboardToggle
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "keyboardToggle")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showKeyboardToggle = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "keyboardToggle")[0].visible = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "mic"
                 text: Translation.tr("Mic toggle")
-                checked: Config.options.bar.utilButtons.showMicToggle
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "micToggle")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showMicToggle = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "micToggle")[0].visible = checked;
                 }
             }
         }
@@ -211,17 +211,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "dark_mode"
                 text: Translation.tr("Dark/Light toggle")
-                checked: Config.options.bar.utilButtons.showDarkModeToggle
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "darkModeToggle")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showDarkModeToggle = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "darkModeToggle")[0].visible = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "speed"
                 text: Translation.tr("Performance Profile toggle")
-                checked: Config.options.bar.utilButtons.showPerformanceProfileToggle
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "performanceProfileToggle")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showPerformanceProfileToggle = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "performanceProfileToggle")[0].visible = checked;
                 }
             }
         }
@@ -230,9 +230,9 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "videocam"
                 text: Translation.tr("Record")
-                checked: Config.options.bar.utilButtons.showScreenRecord
+                checked: Config.options.bar.utilButtons.filter(button => button.id === "screenRecord")[0].visible
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showScreenRecord = checked;
+                    Config.options.bar.utilButtons.filter(button => button.id === "screenRecord")[0].visible = checked;
                 }
             }
         }

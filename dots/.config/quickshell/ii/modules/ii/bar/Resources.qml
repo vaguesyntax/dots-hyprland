@@ -16,34 +16,46 @@ MouseArea {
 
         spacing: 0
         anchors.fill: parent
-        anchors.leftMargin: 4
-        anchors.rightMargin: 4
+        //anchors.leftMargin: 4
+        //anchors.rightMargin: 4
 
-        Resource {
-            iconName: "memory"
-            percentage: ResourceUsage.memoryUsedPercentage
-            warningThreshold: Config.options.bar.resources.memoryWarningThreshold
+        BarContainer {
+            sourceComp: memoryResource
+            leftMost: true
+            Resource {
+                id: memoryResource
+                iconName: "memory"
+                percentage: ResourceUsage.memoryUsedPercentage
+                warningThreshold: Config.options.bar.resources.memoryWarningThreshold
+                anchors.centerIn: parent
+            }
         }
 
-        Resource {
-            iconName: "swap_horiz"
-            percentage: ResourceUsage.swapUsedPercentage
-            shown: (Config.options.bar.resources.alwaysShowSwap && percentage > 0) || 
-                (MprisController.activePlayer?.trackTitle == null) ||
-                root.alwaysShowAllResources
-            Layout.leftMargin: shown ? 6 : 0
-            warningThreshold: Config.options.bar.resources.swapWarningThreshold
+        BarContainer {
+            sourceComp: swapResource
+            Layout.leftMargin: sourceComp.shown ? 6 : 0
+            Resource {
+                id: swapResource
+                iconName: "swap_horiz"
+                anchors.centerIn: parent
+                percentage: ResourceUsage.swapUsedPercentage
+                warningThreshold: Config.options.bar.resources.swapWarningThreshold
+            }
         }
 
-        Resource {
-            iconName: "planner_review"
-            percentage: ResourceUsage.cpuUsage
-            shown: Config.options.bar.resources.alwaysShowCpu || 
-                !(MprisController.activePlayer?.trackTitle?.length > 0) ||
-                root.alwaysShowAllResources
-            Layout.leftMargin: shown ? 6 : 0
-            warningThreshold: Config.options.bar.resources.cpuWarningThreshold
+        BarContainer {
+            sourceComp: cpuResource
+            Layout.leftMargin: sourceComp.shown ? 6 : 0
+            rightMost: true
+            Resource {
+                id: cpuResource
+                iconName: "planner_review"
+                anchors.centerIn: parent
+                percentage: ResourceUsage.cpuUsage
+                warningThreshold: Config.options.bar.resources.cpuWarningThreshold
+            }
         }
+        
 
     }
 
