@@ -66,10 +66,18 @@ Item { // Bar content region
             anchors.fill: parent
             spacing: 10
 
-            Bar.LeftSidebarButton { // Left sidebar button
-                Layout.alignment: Qt.AlignHCenter
+            Bar.BarContainer {
+                sourceComp: leftSidebarButton
+                vertical: true
+                leftMost: true
                 Layout.topMargin: (Appearance.sizes.baseVerticalBarWidth - implicitWidth) / 2 + Appearance.sizes.hyprlandGapsOut
-                colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Config.options.bar.borderless ? ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1) : Appearance.colors.colSurfaceContainerHigh
+                Layout.alignment: Qt.AlignHCenter
+                Bar.LeftSidebarButton { // Left sidebar button
+                    id: leftSidebarButton
+                    anchors.centerIn: parent
+                    
+                    //colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Config.options.bar.borderless ? ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1) : Appearance.colors.colSurfaceContainerHigh
+                }
             }
 
             Item {
@@ -83,26 +91,17 @@ Item { // Bar content region
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
-            topMargin: 60 //!FIXME
+            topMargin: 56 //!FIXME
         }
         spacing: 10
 
-        Resources {
-            id: resourcesWidget
-            Layout.fillWidth: true
-            Layout.fillHeight: false
-        }
-
-        HorizontalBarSeparator {
-            visible: Config.options.bar.borderless
-        }
-
         Bar.BarContainer {
             sourceComp: verticalMediaWidget
-            leftMost: true
             rightMost: true
             vertical: true
             extendHeight: true
+            heightExtendMultiplier: 1.6
+            anchors.horizontalCenter: parent.horizontalCenter
             VerticalMedia {
                 id: verticalMediaWidget
                 anchors.centerIn: parent
@@ -110,6 +109,30 @@ Item { // Bar content region
                 Layout.fillHeight: false
             }
         }
+
+        HorizontalBarSeparator {
+            visible: Config.options.bar.borderless
+        }
+
+        Bar.BarContainer {
+            sourceComp: resourcesWidget
+            vertical: true
+            leftMost: true
+            rightMost: true
+            extendHeight: true
+            heightExtendMultiplier: 1.1
+            Resources {
+                id: resourcesWidget
+                anchors.centerIn: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+            }
+        }
+        
+
+        
+
+        
     }
 
     Bar.BarContainer {

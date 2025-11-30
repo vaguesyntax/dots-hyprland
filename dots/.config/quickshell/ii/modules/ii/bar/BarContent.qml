@@ -69,6 +69,7 @@ Item { // Bar content region
 
         // Visual content
         ScrollHint {
+            z: 10
             reveal: barLeftSideMouseArea.hovered
             icon: "light_mode"
             tooltipText: Translation.tr("Scroll to change brightness")
@@ -81,14 +82,24 @@ Item { // Bar content region
             id: leftSectionRowLayout
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 10
+            spacing: 10  // ?useless
 
-            LeftSidebarButton { // Left sidebar button
-                id: leftSidebarButton
-                Layout.alignment: Qt.AlignVCenter
+            BarContainer {
+                sourceComp: leftSidebarButton
                 Layout.leftMargin: Appearance.rounding.screenRounding
-                colBackground: barLeftSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : Config.options.bar.borderless ? ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1) : Appearance.colors.colSurfaceContainerHigh
+                //implicitWidth: sourceComp.implicitWidth 
+                leftMost: true
+                LeftSidebarButton { // Left sidebar button
+                    id: leftSidebarButton
+                    anchors.centerIn: parent
+                    Layout.alignment: Qt.AlignVCenter
+
+                    
+                    colBackground: barLeftSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
+                }
             }
+
+            
 
             /* ActiveWindow { //? I dont think this is good?
                 visible: root.useShortenedForm === 0
@@ -104,7 +115,7 @@ Item { // Bar content region
         anchors {
             left: barLeftSideMouseArea.right
             verticalCenter: parent.verticalCenter
-            margins: 10
+            margins: 4
         }
         spacing: 10
 
@@ -112,7 +123,6 @@ Item { // Bar content region
             sourceComp: mediaWidget
             Layout.fillWidth: true
             anchors.verticalCenter: parent.verticalCenter
-            leftMost: true
             rightMost: true
             Media {
                 id: mediaWidget
@@ -194,17 +204,28 @@ Item { // Bar content region
             }
         }
 
-        ClockWidget {
-            id: clockWidget
-            showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)                        
+        BarContainer {
+            sourceComp: clockWidget
+            extendWidth: true
+            widthExtendMultiplier: 1.5
+            rightMost: !Config.options.bar.weather.enable
+            ClockWidget {
+                id: clockWidget
+                anchors.centerIn: parent
+                showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)                        
+            }
         }
-
-        UtilButtons {
-            id: utilButtons
-            anchors.verticalCenter: parent.verticalCenter
-            visible: (Config.options.bar.verbose && root.useShortenedForm === 0)
+        
+        BarContainer {
+            sourceComp: utilButtons
+            leftMost: true
+            UtilButtons {
+               id: utilButtons
+               anchors.centerIn: parent
+               visible: (Config.options.bar.verbose && root.useShortenedForm === 0)
+            }   
         }
-
+        
         BarContainer {
             id: batteryContainer
             sourceComp: batteryIndicator

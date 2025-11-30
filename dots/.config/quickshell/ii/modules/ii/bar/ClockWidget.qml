@@ -16,37 +16,25 @@ Item {
         anchors.centerIn: parent
         spacing: 4
 
-        BarContainer {
-            sourceComp: time
-            leftMost: true
-            extendWidth: true
-            rightMost: !dateContainer.visible
-            StyledText {
-                id: time
-                anchors.centerIn: parent
-                font.pixelSize: Appearance.font.pixelSize.large
-                color: Appearance.colors.colOnLayer1
-                text: DateTime.time
-            }
+        StyledText {
+            font.pixelSize: Appearance.font.pixelSize.large
+            color: Appearance.colors.colOnLayer1
+            text: DateTime.time
         }
 
-        BarContainer {
-            id: dateContainer
-            sourceComp: date
-            visible: sourceComp.visible
-            widthExtendMultiplier: 1.5
-            extendWidth: true
-            rightMost: !Config.options.bar.weather.enable
-            StyledText {
-                id: date
-                anchors.centerIn: parent
-                visible: root.showDate
-                font.pixelSize: Appearance.font.pixelSize.small
-                color: Appearance.colors.colOnLayer1
-                text: DateTime.longDate
-            }
+        StyledText {
+            visible: root.showDate
+            font.pixelSize: Appearance.font.pixelSize.small
+            color: Appearance.colors.colOnLayer1
+            text: "•"
         }
-        
+
+        StyledText {
+            visible: root.showDate
+            font.pixelSize: Appearance.font.pixelSize.small
+            color: Appearance.colors.colOnLayer1
+            text: DateTime.longDate
+        }
     }
 
     MouseArea {
