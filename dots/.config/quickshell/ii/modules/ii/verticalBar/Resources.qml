@@ -13,7 +13,7 @@ MouseArea {
 
     ColumnLayout {
         id: columnLayout
-        spacing: 4
+        spacing: Config.options.bar.borderless ? 0 : 4
         anchors.fill: parent
 
         Bar.BarContainer {
@@ -36,7 +36,6 @@ MouseArea {
             sourceComp: swapWidget
             vertical: true
             extendHeight: true
-            rightMost: true
             Resource {
                 id: swapWidget
                 anchors.centerIn: parent

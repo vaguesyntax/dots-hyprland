@@ -17,9 +17,8 @@ Item { // Bar content region
     property var brightnessMonitor: Brightness.getMonitorForScreen(screen)
 
     component HorizontalBarSeparator: Rectangle {
-        Layout.leftMargin: Appearance.sizes.baseBarHeight / 3
-        Layout.rightMargin: Appearance.sizes.baseBarHeight / 3
-        Layout.fillWidth: true
+        anchors.horizontalCenter: parent.horizontalCenter
+        implicitWidth: Appearance.sizes.barHeight / 2
         implicitHeight: 1
         color: Appearance.colors.colOutlineVariant
     }
@@ -70,7 +69,7 @@ Item { // Bar content region
             Bar.LeftSidebarButton { // Left sidebar button
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: (Appearance.sizes.baseVerticalBarWidth - implicitWidth) / 2 + Appearance.sizes.hyprlandGapsOut
-                colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Appearance.colors.colLayer1
+                colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Config.options.bar.borderless ? ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1) : Appearance.colors.colLayer1
             }
 
             Item {
@@ -94,6 +93,10 @@ Item { // Bar content region
             Layout.fillHeight: false
         }
 
+        HorizontalBarSeparator {
+            visible: Config.options.bar.borderless
+        }
+
         Bar.BarContainer {
             sourceComp: verticalMediaWidget
             leftMost: true
@@ -108,10 +111,6 @@ Item { // Bar content region
             }
         }
     }
-
-    
-    
-    
 
     Bar.BarContainer {
         id: middleCenterGroup
@@ -164,6 +163,10 @@ Item { // Bar content region
             }
         }
 
+        HorizontalBarSeparator {
+            visible: Config.options.bar.borderless
+        }
+
         Bar.BarContainer {
             sourceComp: verticalDateWidget
             rightMost: true
@@ -178,54 +181,6 @@ Item { // Bar content region
         }
     }
 
-    /* Column { // Middle section
-        id: middleSection
-        anchors.top: parent.top //FIXME
-        spacing: 4
-
-        Bar.BarGroup {
-            vertical: true
-            padding: 8
-            
-            
-            HorizontalBarSeparator {}
-
-            
-        }
-
-        HorizontalBarSeparator {
-            visible: Config.options?.bar.borderless
-        }
-
-        
-
-        HorizontalBarSeparator {
-            visible: Config.options?.bar.borderless
-        }
-
-        Bar.BarGroup {
-            vertical: true
-            padding: 8
-            
-            
-
-            HorizontalBarSeparator {}
-
-            
-
-            HorizontalBarSeparator {
-                visible: Battery.available
-            }
-
-            BatteryIndicator {
-                visible: Battery.available
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-            }
-            
-        }
-    }
- */
     FocusedScrollMouseArea { // Bottom section | scroll to change volume
         id: barBottomSectionMouseArea
 
@@ -274,7 +229,7 @@ Item { // Bar content region
                 implicitWidth: indicatorsColumnLayout.implicitWidth + 6 * 2
 
                 buttonRadius: Appearance.rounding.full
-                colBackground: barBottomSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
+                colBackground: barBottomSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Config.options.bar.borderless ? ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1) : Appearance.colors.colLayer1
                 colBackgroundHover: Appearance.colors.colLayer1Hover
                 colRipple: Appearance.colors.colLayer1Active
                 colBackgroundToggled: Appearance.colors.colSecondaryContainer

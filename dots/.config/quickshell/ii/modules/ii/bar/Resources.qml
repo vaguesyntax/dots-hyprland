@@ -14,10 +14,8 @@ MouseArea {
     RowLayout {
         id: rowLayout
 
-        spacing: 0
+        spacing: 4
         anchors.fill: parent
-        //anchors.leftMargin: 4
-        //anchors.rightMargin: 4
 
         BarContainer {
             sourceComp: memoryResource
@@ -33,7 +31,6 @@ MouseArea {
 
         BarContainer {
             sourceComp: swapResource
-            Layout.leftMargin: sourceComp.shown ? 6 : 0
             Resource {
                 id: swapResource
                 iconName: "swap_horiz"
@@ -45,7 +42,6 @@ MouseArea {
 
         BarContainer {
             sourceComp: cpuResource
-            Layout.leftMargin: sourceComp.shown ? 6 : 0
             rightMost: true
             Resource {
                 id: cpuResource
@@ -55,8 +51,6 @@ MouseArea {
                 warningThreshold: Config.options.bar.resources.cpuWarningThreshold
             }
         }
-        
-
     }
 
     ResourcesPopup {
