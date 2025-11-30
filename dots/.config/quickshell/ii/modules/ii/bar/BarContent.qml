@@ -55,7 +55,6 @@ Item { // Bar content region
             top: parent.top
             bottom: parent.bottom
             left: parent.left
-           
         }
         implicitWidth: leftSectionRowLayout.implicitWidth
         implicitHeight: Appearance.sizes.baseBarHeight

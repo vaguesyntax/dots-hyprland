@@ -51,7 +51,7 @@ Item { // Bar content region
         anchors.top: parent.top
         implicitHeight: topSectionColumnLayout.implicitHeight
         implicitWidth: Appearance.sizes.baseVerticalBarWidth
-        height: (root.height - middleSection.height) / 2
+        height: (root.height - middleCenterGroup.height) / 2
         width: Appearance.sizes.verticalBarWidth
 
         onScrollDown: root.brightnessMonitor.setBrightness(root.brightnessMonitor.brightness - 0.05)
@@ -70,7 +70,7 @@ Item { // Bar content region
             Bar.LeftSidebarButton { // Left sidebar button
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: (Appearance.sizes.baseVerticalBarWidth - implicitWidth) / 2 + Appearance.sizes.hyprlandGapsOut
-                colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
+                colBackground: barTopSectionMouseArea.hovered ? Appearance.colors.colLayer1Hover : Appearance.colors.colLayer1
             }
 
             Item {
@@ -80,52 +80,124 @@ Item { // Bar content region
         }
     }
 
-    Column { // Middle section
+    Column {
+        anchors {
+            top: parent.top
+            horizontalCenter: parent.horizontalCenter
+            topMargin: 60 //!FIXME
+        }
+        spacing: 10
+
+        Resources {
+            id: resourcesWidget
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+        }
+
+        Bar.BarContainer {
+            sourceComp: verticalMediaWidget
+            leftMost: true
+            rightMost: true
+            vertical: true
+            extendHeight: true
+            VerticalMedia {
+                id: verticalMediaWidget
+                anchors.centerIn: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+            }
+        }
+    }
+
+    
+    
+    
+
+    Bar.BarContainer {
+        id: middleCenterGroup
+        anchors {
+            verticalCenter: parent.verticalCenter
+            horizontalCenter: parent.horizontalCenter
+        }
+
+        leftMost: true
+        rightMost: true
+        sourceComp: workspacesWidget
+        vertical: true
+
+        Bar.Workspaces {
+            id: workspacesWidget
+            anchors.centerIn: parent
+            vertical: true
+            MouseArea {
+                // Right-click to toggle overview
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+
+                onPressed: event => {
+                    if (event.button === Qt.RightButton) {
+                        GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+                    }
+                }
+            }
+        }
+    }
+
+    Column {
+        anchors {
+            bottom: barBottomSectionMouseArea.top
+            horizontalCenter: parent.horizontalCenter
+        }
+        spacing: 4
+
+        Bar.BarContainer {
+            sourceComp: verticalClockWidget
+            leftMost: true
+            vertical: true
+            heightExtendMultiplier: 1.3
+            extendHeight: true
+            VerticalClockWidget {
+                id: verticalClockWidget
+                anchors.centerIn: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+            }
+        }
+
+        Bar.BarContainer {
+            sourceComp: verticalDateWidget
+            rightMost: true
+            vertical: true
+            extendHeight: true
+            VerticalDateWidget {
+                id: verticalDateWidget
+                anchors.centerIn: parent
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+            }
+        }
+    }
+
+    /* Column { // Middle section
         id: middleSection
-        anchors.centerIn: parent
+        anchors.top: parent.top //FIXME
         spacing: 4
 
         Bar.BarGroup {
             vertical: true
             padding: 8
-            Resources {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-            }
+            
             
             HorizontalBarSeparator {}
 
-            VerticalMedia {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-            }
+            
         }
 
         HorizontalBarSeparator {
             visible: Config.options?.bar.borderless
         }
 
-        Bar.BarGroup {
-            id: middleCenterGroup
-            vertical: true
-            padding: 6
-
-            Bar.Workspaces {
-                id: workspacesWidget
-                vertical: true
-                MouseArea {
-                    // Right-click to toggle overview
-                    anchors.fill: parent
-                    acceptedButtons: Qt.RightButton
-
-                    onPressed: event => {
-                        if (event.button === Qt.RightButton) {
-                            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
-                        }
-                    }
-                }
-            }
-        }
+        
 
         HorizontalBarSeparator {
             visible: Config.options?.bar.borderless
@@ -135,17 +207,11 @@ Item { // Bar content region
             vertical: true
             padding: 8
             
-            VerticalClockWidget {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-            }
+            
 
             HorizontalBarSeparator {}
 
-            VerticalDateWidget {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-            }
+            
 
             HorizontalBarSeparator {
                 visible: Battery.available
@@ -159,7 +225,7 @@ Item { // Bar content region
             
         }
     }
-
+ */
     FocusedScrollMouseArea { // Bottom section | scroll to change volume
         id: barBottomSectionMouseArea
 

@@ -19,8 +19,8 @@ Item {
         BarContainer {
             sourceComp: time
             leftMost: true
+            extendWidth: true
             rightMost: !dateContainer.visible
-            implicitWidth: sourceComp.implicitWidth * 2
             StyledText {
                 id: time
                 anchors.centerIn: parent
@@ -34,7 +34,8 @@ Item {
             id: dateContainer
             sourceComp: date
             visible: sourceComp.visible
-            implicitWidth: sourceComp.implicitWidth * 1.5
+            widthExtendMultiplier: 1.5
+            extendWidth: true
             rightMost: true
             StyledText {
                 id: date

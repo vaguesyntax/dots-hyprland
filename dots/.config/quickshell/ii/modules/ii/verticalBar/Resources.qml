@@ -13,28 +13,52 @@ MouseArea {
 
     ColumnLayout {
         id: columnLayout
-        spacing: 10
+        spacing: 4
         anchors.fill: parent
 
-        Resource {
+        Bar.BarContainer {
             Layout.alignment: Qt.AlignHCenter
-            iconName: "memory"
-            percentage: ResourceUsage.memoryUsedPercentage
-            warningThreshold: Config.options.bar.resources.memoryWarningThreshold
+            sourceComp: memoryWidget
+            extendHeight: true
+            vertical: true
+            leftMost: true
+            Resource {
+                id: memoryWidget
+                anchors.centerIn: parent
+                iconName: "memory"
+                percentage: ResourceUsage.memoryUsedPercentage
+                warningThreshold: Config.options.bar.resources.memoryWarningThreshold
+            }
+        }
+        
+        Bar.BarContainer {
+            Layout.alignment: Qt.AlignHCenter
+            sourceComp: swapWidget
+            vertical: true
+            extendHeight: true
+            rightMost: true
+            Resource {
+                id: swapWidget
+                anchors.centerIn: parent
+                iconName: "swap_horiz"
+                percentage: ResourceUsage.swapUsedPercentage
+                warningThreshold: Config.options.bar.resources.swapWarningThreshold
+            }
         }
 
-        Resource {
+        Bar.BarContainer {
             Layout.alignment: Qt.AlignHCenter
-            iconName: "swap_horiz"
-            percentage: ResourceUsage.swapUsedPercentage
-            warningThreshold: Config.options.bar.resources.swapWarningThreshold
-        }
-
-        Resource {
-            Layout.alignment: Qt.AlignHCenter
-            iconName: "planner_review"
-            percentage: ResourceUsage.cpuUsage
-            warningThreshold: Config.options.bar.resources.cpuWarningThreshold
+            sourceComp: cpuWidget
+            extendHeight: true
+            vertical: true
+            rightMost: true
+            Resource {
+                id: cpuWidget
+                anchors.centerIn: parent
+                iconName: "planner_review"
+                percentage: ResourceUsage.cpuUsage
+                warningThreshold: Config.options.bar.resources.cpuWarningThreshold
+            }
         }
 
     }
