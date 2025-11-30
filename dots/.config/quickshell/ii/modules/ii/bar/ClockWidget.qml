@@ -36,7 +36,7 @@ Item {
             visible: sourceComp.visible
             widthExtendMultiplier: 1.5
             extendWidth: true
-            rightMost: true
+            rightMost: !Config.options.bar.weather.enable
             StyledText {
                 id: date
                 anchors.centerIn: parent

@@ -177,7 +177,7 @@ Item { // Bar content region
             margins: 6
         }
         layoutDirection: Qt.RightToLeft
-        spacing: 6
+        spacing: 4
 
         Loader {
             active: Config.options.bar.weather.enable
@@ -186,7 +186,6 @@ Item { // Bar content region
             height: active ? item.implicitHeight : 0
             sourceComponent: BarContainer {
                 sourceComp: weatherBar
-                leftMost: true
                 rightMost: true
                 WeatherBar {
                     anchors.centerIn: parent
@@ -197,7 +196,6 @@ Item { // Bar content region
 
         ClockWidget {
             id: clockWidget
-            
             showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)                        
         }
 
@@ -225,11 +223,9 @@ Item { // Bar content region
 
     FocusedScrollMouseArea { // Right side | scroll to change volume
         id: barRightSideMouseArea
-        z: 0
         anchors {
             top: parent.top
             bottom: parent.bottom
-            //left: batteryContainer.right
             right: parent.right
         }
         implicitWidth: rightSectionRowLayout.implicitWidth

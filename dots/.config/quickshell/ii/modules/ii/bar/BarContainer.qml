@@ -29,5 +29,4 @@ Rectangle {
     bottomLeftRadius: root.vertical ?  root.rightMost ? height / 2 : Appearance.rounding.verysmall : root.leftMost ? height / 2 : Appearance.rounding.verysmall
     topRightRadius: root.vertical ?  root.leftMost ? height / 2 : Appearance.rounding.verysmall : root.rightMost ? height / 2 : Appearance.rounding.verysmall
     bottomRightRadius: root.rightMost ? height / 2 : Appearance.rounding.verysmall
-
 }
