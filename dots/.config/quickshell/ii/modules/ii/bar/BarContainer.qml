@@ -23,7 +23,7 @@ Rectangle {
     implicitHeight: vertical ? isBorderless ? sourceComp.implicitHeight + padding * 2 : extendHeight ? sourceComp.implicitHeight * root.heightExtendMultiplier + padding * 2 : sourceComp.implicitHeight + padding * 2 : Appearance.sizes.barHeight - padding * 2
     implicitWidth: vertical ?  Appearance.sizes.barHeight - padding * 2 : extendWidth ? sourceComp.implicitWidth * root.widthExtendMultiplier + padding * 2 : sourceComp.implicitWidth + padding * 2
     
-    color: Config.options?.bar.borderless ? "transparent" : Appearance.colors.colLayer1
+    color: Config.options?.bar.borderless ? "transparent" : Appearance.colors.colSurfaceContainerHigh
 
     topLeftRadius: root.leftMost ? height / 2 : Appearance.rounding.verysmall
     bottomLeftRadius: root.vertical ?  root.rightMost ? height / 2 : Appearance.rounding.verysmall : root.leftMost ? height / 2 : Appearance.rounding.verysmall

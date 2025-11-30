@@ -77,10 +77,10 @@ Item {
 
             Layout.fillHeight: !root.vertical
             Layout.fillWidth: root.vertical
-            background.implicitWidth: 24
-            background.implicitHeight: 24
+            background.implicitWidth: 28
+            background.implicitHeight: 28
             background.anchors.centerIn: this
-            colBackground: Config.options.bar.borderless ? "transparent" : Appearance.colors.colLayer1
+            colBackground: Config.options.bar.borderless ? "transparent" : Appearance.colors.colSurfaceContainerHigh
             colBackgroundToggled: Appearance.colors.colSecondaryContainer
             colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
             colRippleToggled: Appearance.colors.colSecondaryContainerActive
