@@ -20,5 +20,6 @@ I use the main branch as my daily driver (mostly). There shouldn’t be any issu
 - PR: https://github.com/end-4/dots-hyprland/pull/2389 -> Position settings (top-center-bottom) for overview | Branch: [overview-changes](https://github.com/vaguesyntax/dots-hyprland/tree/overview-changes)
   
 - Feature: Shell bar improvements (i can open a PR for it in the future):
-- 
-  <img width="1915" height="804" alt="image" src="https://github.com/user-attachments/assets/bc20a1b2-fe76-45c8-aebe-dd2b27a44bc9" />
+
+  <img width="1141" height="1078" alt="image" src="https://github.com/user-attachments/assets/5dbfdf6f-9225-4bcc-82a9-9103cb8765d9" />
+
