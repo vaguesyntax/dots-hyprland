@@ -10,7 +10,7 @@ This main branch is a collection of my PRs (or personal work that I plan to open
 I use the main branch as my daily driver (mostly). There shouldn’t be any issues, but use these only if you know what you’re doing.
 
 <div align="center">
-    <h2> PR's (features) list </h2>
+    <h2> PR's (features) list (i hope I can keep these up to date) </h2>
 </div>
 
 - PR: https://github.com/end-4/dots-hyprland/pull/2648 -> Wallpaper selection thumbnails | Branch: [fix-thumb-scripts](https://github.com/vaguesyntax/dots-hyprland/tree/fix-thumb-scripts)
