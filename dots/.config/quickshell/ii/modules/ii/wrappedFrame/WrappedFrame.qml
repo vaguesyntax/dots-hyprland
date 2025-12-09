@@ -40,6 +40,10 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    }
+
     component ScreenCorner: PanelWindow {
         id: screenCornerWindow
         property bool left
