@@ -18,8 +18,18 @@ I use the main branch as my daily driver (mostly). There shouldn’t be any issu
 - PR: https://github.com/end-4/dots-hyprland/pull/2539 -> Video wallpaper fixes | Branch: [video-wallpaper-fixes](https://github.com/vaguesyntax/dots-hyprland/tree/video-wallpaper-fixes)
 - PR: https://github.com/end-4/dots-hyprland/pull/2515 -> Config option for overview to show only on focused monitor | Branch  [overview-on-focused-monitor](https://github.com/vaguesyntax/dots-hyprland/tree/overview-on-focused-monitor)
 - PR: https://github.com/end-4/dots-hyprland/pull/2389 -> Position settings (top-center-bottom) for overview | Branch: [overview-changes](https://github.com/vaguesyntax/dots-hyprland/tree/overview-changes)
-  
-- Feature: Shell bar improvements (i can open a PR for it in the future):
+
+<div align="center">
+    <h3> Features i may open a pr later </h> </h3>
+    <h5> (They are also in seperate branches) </h5>
+</div>
+
+- Feature: Shell bar improvements:
 
   <img width="1141" height="1078" alt="image" src="https://github.com/user-attachments/assets/5dbfdf6f-9225-4bcc-82a9-9103cb8765d9" />
+
+- Feature: Background media widget:
+
+<img width="402" height="339" alt="image" src="https://github.com/user-attachments/assets/dfb958cb-be78-4bb7-a4f9-ac1afe6e2bc4" />
+
 
