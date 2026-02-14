@@ -22,6 +22,12 @@ ApplicationWindow {
     property string firstRunFileContent: "This file is just here to confirm you've been greeted :>"
     property real contentPadding: 8
     property bool showNextTime: false
+
+    property int currentPage: 0
+    property real scrollPos: 0
+    property string lastSearch: ""
+    property int lastSearchIndex: 0
+
     property var pages: [
         {
             name: Translation.tr("Quick"),
@@ -65,7 +71,7 @@ ApplicationWindow {
             component: "modules/settings/About.qml"
         }
     ]
-    property int currentPage: 0
+    
 
     visible: true
     onClosing: Qt.quit()
@@ -135,21 +141,17 @@ ApplicationWindow {
             }
         }
 
-        Item { // Titlebar
-            visible: Config.options?.windows.showTitlebar
+        RowLayout {
+            Layout.alignment: Qt.AlignCenter
             Layout.fillWidth: true
             Layout.fillHeight: false
-            implicitHeight: Math.max(titleText.implicitHeight, windowControlsRow.implicitHeight)
+
+
             StyledText {
                 id: titleText
-                anchors {
-                    left: Config.options.windows.centerTitle ? undefined : parent.left
-                    horizontalCenter: Config.options.windows.centerTitle ? parent.horizontalCenter : undefined
-                    verticalCenter: parent.verticalCenter
-                    leftMargin: 12
-                }
                 color: Appearance.colors.colOnLayer0
                 text: Translation.tr("Settings")
+                Layout.leftMargin: 20
                 font {
                     family: Appearance.font.family.title
                     pixelSize: Appearance.font.pixelSize.title
@@ -356,6 +358,19 @@ ApplicationWindow {
                         function onCurrentPageChanged() {
                             switchAnim.complete();
                             switchAnim.start();
+                        }
+                        function onScrollPosChanged() {
+                            if (root.scrollPos == -1) return
+                            scrollTimer.start()
+                        }
+                    }
+
+                    Timer {
+                        id: scrollTimer
+                        interval: 250
+                        onTriggered: {
+                            pageLoader.item.contentY = root.scrollPos
+                            root.scrollPos = -1
                         }
                     }
 

@@ -23,17 +23,17 @@ Item {
         anchors.fill: parent
     }
 
+    /// Search Registry ///
+    Component.onCompleted: {
+        if (page?.register == false) return
+        let section = SearchRegistry.findSection(root)
+        if (section && text) section.addKeyword(text)
+    }
+
     RowLayout {
         id: rowLayout
         anchors.fill: parent
         spacing: 0
-
-        /// Search Registry ///
-        Component.onCompleted: {
-            if (page?.register == false) return
-            let section = SearchRegistry.findSection(root)
-            if (section && text) section.addKeyword(text)
-        }
 
         readonly property string currentSearch: SearchRegistry.currentSearch
         onCurrentSearchChanged: {
