@@ -1,3 +1,4 @@
+import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -10,7 +11,16 @@ MouseArea {
     id: root
     required property var fileModelData
     property bool isDirectory: fileModelData.fileIsDir
-    property bool useThumbnail: Images.isValidImageByName(fileModelData.fileName)
+
+    property bool isVideo: {
+        const path = fileModelData.fileName.toLowerCase();
+        return path.endsWith('.mp4') || path.endsWith('.webm') || 
+                path.endsWith('.mkv') || path.endsWith('.avi') || 
+                path.endsWith('.mov') || path.endsWith('.m4v') ||
+                path.endsWith('.ogv');
+    }
+    property bool useThumbnail: Images.isValidImageByName(fileModelData.fileName) || root.isVideo
+    property bool showLoadingIndicator: false
 
     property alias colBackground: background.color
     property alias colText: wallpaperItemName.color
@@ -25,6 +35,14 @@ MouseArea {
     hoverEnabled: true
     onClicked: root.activated()
 
+    function getWallhavenId(url) {
+        const urlStr = url.toString()
+        const fileName = urlStr.split('/').pop() 
+        const fileNameWithoutExt = fileName.split('.')[0] 
+        const match = fileNameWithoutExt.match(/^wallhaven-([a-zA-Z0-9]{6})$/i)
+        return match ? match[1] : null
+    }
+    
     Rectangle {
         id: background
         anchors.fill: parent
@@ -92,6 +110,72 @@ MouseArea {
                                 height: wallpaperItemImageContainer.height
                                 radius: Appearance.rounding.small
                             }
+                        }
+                    }
+                }
+
+                Loader {
+                    id: videoIconLoader
+                    active: root.isVideo && root.useThumbnail
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.margins: 8
+                    sourceComponent: MaterialSymbol {
+                        text: "video_library"
+                        color: Appearance.colors.colPrimary
+                        font.pixelSize: Appearance.font.pixelSize.large
+                        fill: 1
+                    }
+                }
+
+                Loader {
+                    id: similarImageButtonLoader
+                    active: root.getWallhavenId(fileModelData.fileName) && root.useThumbnail
+                    
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.margins: 8
+
+                    asynchronous: true
+                    sourceComponent: RippleButton {
+                        id: button
+                        anchors.centerIn: parent
+
+                        implicitWidth: 30
+                        implicitHeight: 30
+
+                        colBackground: "transparent"
+                        colBackgroundHover: Appearance.colors.colSecondaryContainerHover
+                        colRipple: Appearance.colors.colSecondaryContainerActive
+
+                        // A better way would be better, it will broke when new tabs are added, but it works for now
+                        property int wallpaperTabIndex: {
+                            let index = 0;
+                            if (Config.options.policies.ai !== 0) index++;
+                            if (Config.options.policies.translator !== 0) index++;
+                            return Config.options.policies.wallpapers !== 0 ? index : -1;
+                        }
+
+                        onClicked: {
+                            WallpaperBrowser.addSimilarImageMessage(Translation.tr("Searching for a similar image:"), fileModelData.filePath)
+                            WallpaperBrowser.moreLikeThisPicture(root.getWallhavenId(fileModelData.fileName), 1);
+                            Persistent.states.sidebar.policies.tab = button.wallpaperTabIndex;
+                            
+                            GlobalStates.policiesPanelOpen = true;
+                            GlobalStates.wallpaperSelectorOpen = false;
+                        }
+
+                        MaterialSymbol {
+                            text: "image_search"
+
+                            anchors.centerIn: parent
+                            color: Appearance.colors.colPrimary
+                            font.pixelSize: Appearance.font.pixelSize.large
+                            fill: 1
+                        }
+
+                        StyledToolTip {
+                            text: Translation.tr("Search for more images like this in the 'Wallpapers' tab")
                         }
                     }
                 }

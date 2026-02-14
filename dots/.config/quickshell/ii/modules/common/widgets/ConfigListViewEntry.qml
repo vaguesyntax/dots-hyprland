@@ -10,9 +10,10 @@ Item {
     
     required property var modelData
 
-    property color colBackground: visualIndex % 2 == 0 ? Appearance.colors.colLayer3 : Appearance.colors.colLayer2
-    property color colHover: visualIndex % 2 == 0 ? Appearance.colors.colLayer3Hover : Appearance.colors.colLayer2Hover
-    property color colActive: visualIndex % 2 == 0 ? Appearance.colors.colLayer3Active : Appearance.colors.colLayer2Active
+    property bool alternateColor: visualIndex % 2 == 0
+    property color colBackground: alternateColor ? Appearance.colors.colLayer3 : Appearance.colors.colLayer2
+    property color colHover: alternateColor ? Appearance.colors.colLayer3Hover : Appearance.colors.colLayer2Hover
+    property color colActive: alternateColor ? Appearance.colors.colLayer3Active : Appearance.colors.colLayer2Active
 
     property color colTitle: Appearance.colors.colOnLayer0
 
@@ -112,7 +113,7 @@ Item {
                 verticalCenter: parent.verticalCenter
                 margins: 20
             }
-            spacing: 20
+            spacing: 10
 
             MaterialSymbol {
                 id: dragIndicatorIcon
@@ -123,9 +124,11 @@ Item {
             
             MaterialSymbol {
                 id: icon
+                Layout.leftMargin: 10
                 text: modelData.icon
                 iconSize: Appearance.font.pixelSize.hugeass
                 color: Appearance.colors.colPrimary
+                fill: 1
             }
 
             StyledText {
@@ -133,7 +136,7 @@ Item {
                 text: modelData.title
                 color: wrapper.colTitle
 
-                Layout.leftMargin: -10
+                Layout.leftMargin: 10
                 font {
                     family: Appearance.font.family.title
                     pixelSize: Appearance.font.pixelSize.normal
@@ -145,43 +148,44 @@ Item {
                 Layout.fillWidth: true
             }
 
-            RippleButton {
-                visible: barSection == 1 // only showing it on center layout
-                id: centerButton
-                implicitWidth: implicitHeight
-                Layout.rightMargin: -10
-                MaterialSymbol {
-                    text: "center_focus_strong"
-                    anchors.centerIn: parent
-                    color: Appearance.colors.colPrimary
-                    iconSize: Appearance.font.pixelSize.huge
-                    fill: modelData.centered ? 1 : 0
-                }
-                StyledToolTip {
-                    text: Translation.tr("Center the component")
-                }
+            Loader {
+                active: modelData.id in page.componentMap
+                sourceComponent: EntryButton {
+                    iconText: "settings"
+                    tooltip: Translation.tr("Settings")
 
-                onClicked: {
-                    root.toggleCenter(wrapper.visualIndex, wrapper.getOrderedList())
+                    onClicked: {
+                        page.scrollTo(modelData.id)
+                    }
                 }
             }
+            
+            
+            Loader {
+                active: barSection == 1 // only showing it on center layout
+                sourceComponent: EntryButton {
+                    iconText: "adjust"
+                    iconFill: modelData.centered
+                    tooltip: Translation.tr("Center")
 
-            RippleButton {
+                    onClicked: {
+                        root.toggleCenter(wrapper.visualIndex, wrapper.getOrderedList())
+                    }
+                }
+            }
+            
+
+            EntryButton {
                 id: removeButton
-                implicitWidth: implicitHeight
-                MaterialSymbol {
-                    text: "close"
-                    anchors.centerIn: parent
-                    color: Appearance.colors.colPrimary
-                    iconSize: Appearance.font.pixelSize.huge
-                }
-                StyledToolTip {
-                    text: Translation.tr("Close")
-                }
+                iconText: "close"
+                tooltip: Translation.tr("Remove")
 
                 onClicked: {
-                    if (modelData != null) 
-                        Config.options.bar.layouts.availableComponents.push(modelData)
+                    if (modelData != null) { // small sanity check
+                        root.sourceListModel.push(modelData)
+                        root.sourceUpdated(root.sourceListModel)
+                    }
+                        
                     let arr = wrapper.getOrderedList()
                     let removed = arr.splice(visualIndex, 1)
                     root.updated(arr)
@@ -230,6 +234,27 @@ Item {
         onReleased: {
             root.updated(wrapper.getOrderedList())
             held = false
+        }
+    }
+
+    component EntryButton: RippleButton {
+        id: button
+        implicitWidth: implicitHeight
+
+        property string iconText: ""
+        property bool iconFill: false
+        property string tooltip: ""
+
+        MaterialSymbol {
+            text: button.iconText
+            anchors.centerIn: parent
+            color: Appearance.colors.colPrimary
+            iconSize: Appearance.font.pixelSize.huge
+            fill: button.iconFill ? 1 : 0
+        }
+
+        StyledToolTip {
+            text: button.tooltip
         }
     }
 }

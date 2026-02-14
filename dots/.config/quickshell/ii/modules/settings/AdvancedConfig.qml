@@ -1,10 +1,10 @@
 import QtQuick
+import QtQuick.Layouts
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 
 ContentPage {
-    id: page
     readonly property int index: 6
     property bool register: parent.register ?? false
     forceWidth: true

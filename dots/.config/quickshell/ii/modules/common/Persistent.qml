@@ -59,7 +59,8 @@ Singleton {
             property string hyprlandInstanceSignature: ""
 
             property JsonObject ai: JsonObject {
-                property string model: "gemini-2.5-flash"
+                property string provider: "google" // AI providers such as google, open router, mistral
+                property string model: "gemini-2.5-flash" // The model of the ai such as 2.5-flash
                 property real temperature: 0.5
             }
 
@@ -68,6 +69,9 @@ Singleton {
             }
 
             property JsonObject sidebar: JsonObject {
+                property JsonObject policies: JsonObject {
+                    property int tab: 0
+                }
                 property JsonObject bottomGroup: JsonObject {
                     property bool collapsed: false
                     property int tab: 0
@@ -84,8 +88,16 @@ Singleton {
             }
 
             property JsonObject overlay: JsonObject {
-                property list<string> open: ["crosshair", "recorder", "volumeMixer", "resources"]
+                property list<string> open: ["crosshair", "recorder", "media", "volumeMixer", "resources"]
                 property JsonObject crosshair: JsonObject {
+                    property bool pinned: false
+                    property bool clickthrough: true
+                    property real x: 827
+                    property real y: 441
+                    property real width: 250
+                    property real height: 100
+                }
+                property JsonObject media: JsonObject {
                     property bool pinned: false
                     property bool clickthrough: true
                     property real x: 827
@@ -142,7 +154,13 @@ Singleton {
                     property real y: 42
                     property real width: 460
                     property real height: 330
+                    property int tabIndex: 0
                 }
+            }
+
+            property JsonObject screenRecord: JsonObject {
+                property bool active: false
+                property int seconds: 0
             }
 
             property JsonObject timer: JsonObject {
@@ -157,6 +175,9 @@ Singleton {
                     property int start: 0
                     property list<var> laps: []
                 }
+            }
+            property JsonObject media: JsonObject {
+                property rect popupRect: Qt.rect(0, 0, 0, 0)
             }
         }
     }

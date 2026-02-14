@@ -21,9 +21,34 @@ Rectangle {
 
     property int barSection // 0: left, 1: center, 2: right
     property var listModel
+    property var sourceListModel
     property int selectedCompIndex
 
     signal updated(var newList)
+    signal sourceUpdated(var newList)
+
+    Component.onCompleted: {
+        initilizateLayout(listModel)
+    }
+
+
+    /*
+     * We have to initilize the layout because we don't define the default values in Config.qml file
+    */
+    function initilizateLayout(list) {
+        let initilizatedLayout = list.map(comp => initilizateComponent(comp))
+        root.updated(initilizatedLayout)
+    }
+
+    function initilizateComponent(comp) {
+        return {
+            id: comp.id,
+            icon: comp.icon,
+            title: comp.title,
+            centered: comp.centered !== undefined ? comp.centered : false,
+            visible: comp.visible !== undefined ? comp.visible : true
+        }
+    }
 
     function toggleCenter(idx, currentList) {
         if (currentList[idx].centered) {
@@ -37,8 +62,6 @@ Rectangle {
 
         root.updated(currentList)
     }
-
-
 
     DelegateModel {
         id: visualModel
@@ -88,8 +111,8 @@ Rectangle {
 
             buttonIcon: "box"
             textRole: "title"
-            model: Config.options.bar.layouts.availableComponents
-            enabled: Config.options.bar.layouts.availableComponents.length >= 1
+            model: sourceListModel
+            enabled: sourceListModel.length >= 1
 
             onActivated: index => {
                 root.selectedCompIndex = index;
@@ -106,19 +129,25 @@ Rectangle {
             bottomRightRadius: Appearance.rounding.full
 
             buttonText: Translation.tr("Add component")
-            enabled: Config.options.bar.layouts.availableComponents.length >= 1
+            enabled: sourceListModel.length >= 1
 
             colBackground: Appearance.colors.colSecondaryContainer
             colBackgroundHover: Appearance.colors.colSecondaryContainerHover
             rippleColor: Appearance.colors.colSecondaryContainerActive
             
             onClicked: {
-                if (Config.options.bar.layouts.availableComponents[root.selectedCompIndex] == null) { // small sanity check
-                    Config.options.bar.layouts.availableComponents.splice(root.selectedCompIndex, 1);
+                if (sourceListModel[root.selectedCompIndex] == null) { // small sanity check
+                    sourceListModel.splice(root.selectedCompIndex, 1);
+                    root.sourceUpdated(sourceListModel);
                     return;
                 }
-                listModel.push(Config.options.bar.layouts.availableComponents[root.selectedCompIndex]);
-                Config.options.bar.layouts.availableComponents.splice(root.selectedCompIndex, 1);
+
+                let newComp = initilizateComponent(sourceListModel[root.selectedCompIndex]);
+                listModel.push(newComp);
+
+                sourceListModel.splice(root.selectedCompIndex, 1);
+
+                root.sourceUpdated(sourceListModel);
                 root.updated(listModel);
             }
         }

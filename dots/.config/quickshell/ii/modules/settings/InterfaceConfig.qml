@@ -3,12 +3,48 @@ import QtQuick.Layouts
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import Quickshell
+import Quickshell.Io
 
 ContentPage {
     id: page
     readonly property int index: 4
     property bool register: parent.register ?? false
     forceWidth: true
+
+    property bool hyprscrollingPluginEnabled: false
+    property bool pluginStateFetched: false
+
+    Process {
+        running: page.contentY > 500 && !pluginStateFetched // fetching the content when scrolled a little to prevent lags
+        command: [ "hyprpm", "list"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let rawOutput = this.text;
+        
+                let cleanOutput = rawOutput.replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
+                let flatText = cleanOutput.replace(/[│└─→]/g, ' ').replace(/\s+/g, ' ');
+
+                let pluginEnabled = flatText.includes("Plugin hyprscrolling enabled: true")
+                page.hyprscrollingPluginEnabled = pluginEnabled
+                page.pluginStateFetched = true
+            }
+        } 
+    }
+
+    ContentSection {
+        icon: "model_training"
+        title: Translation.tr("AI")
+
+        ConfigSwitch {
+            buttonIcon: "buttons_alt"
+            text: Translation.tr("Show provider and model buttons")
+            checked: Config.options.sidebar.ai.showProviderAndModelButtons
+            onCheckedChanged: {
+                Config.options.sidebar.ai.showProviderAndModelButtons = checked;
+            }
+        }
+    }
 
     ContentSection {
         icon: "keyboard"
@@ -347,8 +383,98 @@ ContentPage {
     }
 
     ContentSection {
+        icon: "sticky_note_2"
+        title: Translation.tr("Overlay: Notes")
+
+        ConfigRow {
+            uniform: true
+
+            ConfigSwitch {
+                buttonIcon: "tab"
+                text: Translation.tr("Show tabs")
+                checked: Config.options.overlay.notes.showTabs
+                onCheckedChanged: {
+                    Config.options.overlay.notes.showTabs = checked;
+                }
+            }
+
+            ConfigSwitch {
+                enabled: Config.options.overlay.notes.showTabs
+                buttonIcon: "edit_note"
+                text: Translation.tr("Allow editing the icon")
+                checked: Config.options.overlay.notes.allowEditingIcon
+                onCheckedChanged: {
+                    Config.options.overlay.notes.allowEditingIcon = checked;
+                }
+            }
+            
+        }
+    }
+
+    ContentSection {
+        icon: "music_note"
+        title: Translation.tr("Overlay: Media")
+    
+        ConfigSwitch {
+            buttonIcon: "sliders"
+            text: Translation.tr("Show slider")
+            checked: Config.options.overlay.media.showSlider
+            onCheckedChanged: {
+                Config.options.overlay.media.showSlider = checked;
+            }
+        }
+
+        ConfigSpinBox {
+            icon: "opacity"
+            text: Translation.tr("Background opacity (%)")
+            value: Config.options.overlay.media.backgroundOpacityPercentage
+            from: 0
+            to: 100
+            stepSize: 10
+            onValueChanged: {
+                Config.options.overlay.media.backgroundOpacityPercentage = value;
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Lyrics")
+
+            ConfigSwitch {
+                buttonIcon: "gradient"
+                text: Translation.tr("Use gradient masking")
+                checked: Config.options.overlay.media.useGradientMask
+                onCheckedChanged: {
+                    Config.options.overlay.media.useGradientMask = checked;
+                }
+            }
+
+            ConfigSpinBox {
+                icon: "format_size"
+                text: Translation.tr("Lyrics font size (px)")
+                value: Config.options.overlay.media.lyricSize
+                from: 10
+                to: 30
+                stepSize: 1
+                onValueChanged: {
+                    Config.options.overlay.media.lyricSize = value;
+                }
+            }
+        }
+
+    }
+
+    ContentSection {
         icon: "screenshot_frame_2"
         title: Translation.tr("Region selector (screen snipping/Google Lens)")
+
+        ConfigSwitch {
+            buttonIcon: "monitor"
+            text: Translation.tr('Show only on focused monitor')
+            checked: Config.options.regionSelector.showOnlyOnFocusedMonitor
+            onCheckedChanged: {
+                Config.options.regionSelector.showOnlyOnFocusedMonitor = checked;
+            }
+        }
 
         ContentSubsection {
             title: Translation.tr("Hint target regions")
@@ -456,12 +582,38 @@ ContentPage {
             }
         }
 
-        ConfigSwitch {
-            buttonIcon: "translate"
-            text: Translation.tr('Enable translator')
-            checked: Config.options.sidebar.translator.enable
-            onCheckedChanged: {
-                Config.options.sidebar.translator.enable = checked;
+        ConfigRow {
+            ContentSubsection {
+                title: Translation.tr("Sidebars position")
+
+                ConfigSelectionArray {
+                    currentValue: Config.options.sidebar.position
+                    onSelected: newValue => {
+                        Config.options.sidebar.position = newValue;
+                    }
+                    options: [
+                        {
+                            displayName: Translation.tr("Default"),
+                            icon: "side_navigation",
+                            value: "default"
+                        },
+                        {
+                            displayName: Translation.tr("Inverted"),
+                            icon: "swap_horiz",
+                            value: "inverted"
+                        },
+                        {
+                            displayName: Translation.tr("Left"),
+                            icon: "align_horizontal_left",
+                            value: "left"
+                        },
+                        {
+                            displayName: Translation.tr("Right"),
+                            icon: "align_horizontal_right",
+                            value: "right"
+                        }
+                    ]
+                }
             }
         }
 
@@ -594,16 +746,6 @@ ContentPage {
                     onValueChanged: {
                         Config.options.sidebar.cornerOpen.clicklessCornerVerticalOffset = value;
                     }
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        acceptedButtons: Qt.NoButton
-                        StyledToolTip {
-                            extraVisibleCondition: mouseArea.containsMouse
-                            text: Translation.tr("Why this is cool:\nFor non-0 values, it won't trigger when you reach the\nscreen corner along the horizontal edge, but it will when\nyou do along the vertical edge")
-                        }
-                    }
                 }
             }
             
@@ -690,22 +832,63 @@ ContentPage {
         icon: "overview_key"
         title: Translation.tr("Overview")
 
-        ConfigSwitch {
-            buttonIcon: "check"
-            text: Translation.tr("Enable")
-            checked: Config.options.overview.enable
-            onCheckedChanged: {
-                Config.options.overview.enable = checked;
+        ConfigRow {
+            ConfigSwitch {
+                buttonIcon: "check"
+                text: Translation.tr("Enable")
+                Layout.fillWidth: false
+                checked: Config.options.overview.enable
+                onCheckedChanged: {
+                    Config.options.overview.enable = checked;
+                }
             }
         }
-        ConfigSwitch {
-            buttonIcon: "center_focus_strong"
-            text: Translation.tr("Center icons")
-            checked: Config.options.overview.centerIcons
-            onCheckedChanged: {
-                Config.options.overview.centerIcons = checked;
+
+        ConfigSpinBox {
+            icon: "border_top"
+            text: Translation.tr("Center top padding ratio")
+            value: Config.options.overview.centerTopPaddingRatio
+            from: 1
+            to: 10
+            stepSize: 1
+            onValueChanged: {
+                Config.options.overview.centerTopPaddingRatio = value;
             }
         }
+        
+        ConfigRow {
+            uniform: true
+            ConfigSwitch {
+                buttonIcon: "visibility"
+                text: Translation.tr("Show icons")
+                checked: Config.options.overview.showIcons
+                onCheckedChanged: {
+                    Config.options.overview.showIcons = checked;
+                }
+            }
+            ConfigSwitch {
+                enabled: Config.options.overview.showIcons
+                buttonIcon: "center_focus_strong"
+                text: Translation.tr("Center icons")
+                checked: Config.options.overview.centerIcons
+                onCheckedChanged: {
+                    Config.options.overview.centerIcons = checked;
+                }
+            }
+        }
+        
+        ConfigSwitch {
+            buttonIcon: "grid_3x3"
+            text: Translation.tr("Use workspace map")
+            checked: Config.options.overview.useWorkspaceMap
+            onCheckedChanged: {
+                Config.options.overview.useWorkspaceMap = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Only for multi-monitor setups, you must edit the workspace map manually in config.json\n Refer to the repo wiki for more information")
+            }
+        }
+
         ConfigSpinBox {
             icon: "loupe"
             text: Translation.tr("Scale (%)")
@@ -717,68 +900,236 @@ ContentPage {
                 Config.options.overview.scale = value / 100;
             }
         }
+
+
+        ContentSubsection {
+            title: Translation.tr("Overview style")
+
+            ConfigSelectionArray {
+                currentValue: Config.options.overview.style
+                onSelected: newValue => {
+                    Config.options.overview.style = newValue
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("Classic"),
+                        icon: "radio",
+                        value: "classic"
+                    },
+                    {
+                        displayName: Translation.tr("Scrolling"),
+                        icon: "calendar_view_day",
+                        value: "scrolling"
+                    }
+                ]
+            }
+        }
+
         ConfigRow {
-            uniform: true
-            ConfigSpinBox {
-                icon: "splitscreen_bottom"
-                text: Translation.tr("Rows")
-                value: Config.options.overview.rows
-                from: 1
-                to: 20
-                stepSize: 1
-                onValueChanged: {
-                    Config.options.overview.rows = value;
+            ConfigSwitch {
+                buttonIcon: "high_density"
+                text: Translation.tr("Enable zoom animation")
+                checked: Config.options.overview.showOpeningAnimation
+                onCheckedChanged: {
+                    Config.options.overview.showOpeningAnimation = checked;
+                }
+                StyledToolTip {
+                    text: Translation.tr("Using zoom-in style zoomes the wallpaper in default state, may look pixelated on crisp wallpapers")
                 }
             }
+            Item {
+                Layout.fillWidth: true
+            }
+            ConfigSelectionArray {
+                Layout.fillWidth: false
+                enabled: Config.options.overview.showOpeningAnimation
+                currentValue: Config.options.overview.scrollingStyle.zoomStyle
+                onSelected: newValue => {
+                    Config.options.overview.scrollingStyle.zoomStyle = newValue
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("In"),
+                        icon: "zoom_in_map",
+                        value: "in"
+                    },
+                    {
+                        displayName: Translation.tr("Out"),
+                        icon: "zoom_out_map",
+                        value: "out"
+                    }
+                ]
+            }
+        }
+        
+        ContentSubsection {
+            title: Translation.tr("Classic overview style")
+            visible: Config.options.overview.style === "classic"
+            ConfigRow {
+                uniform: true
+                ConfigSpinBox {
+                    icon: "splitscreen_bottom"
+                    text: Translation.tr("Rows")
+                    value: Config.options.overview.rows
+                    from: 1
+                    to: 20
+                    stepSize: 1
+                    onValueChanged: {
+                        Config.options.overview.rows = value;
+                    }
+                }
+                ConfigSpinBox {
+                    icon: "splitscreen_right"
+                    text: Translation.tr("Columns")
+                    value: Config.options.overview.columns
+                    from: 1
+                    to: 20
+                    stepSize: 1
+                    onValueChanged: {
+                        Config.options.overview.columns = value;
+                    }
+                }
+            }
+
             ConfigSpinBox {
-                icon: "splitscreen_right"
-                text: Translation.tr("Columns")
-                value: Config.options.overview.columns
-                from: 1
-                to: 20
-                stepSize: 1
+                enabled: Config.options.overview.hyprscrollingImplementation.enable
+                icon: "width"
+                text: Translation.tr("Max workspace width")
+                value: Config.options.overview.hyprscrollingImplementation.maxWorkspaceWidth
+                from: 100
+                to: 1900
+                stepSize: 100
                 onValueChanged: {
-                    Config.options.overview.columns = value;
+                    Config.options.overview.hyprscrollingImplementation.maxWorkspaceWidth = value;
+                }
+            }
+
+            ConfigRow {
+                uniform: true
+                ConfigSelectionArray {
+                    currentValue: Config.options.overview.orderRightLeft
+                    onSelected: newValue => {
+                        Config.options.overview.orderRightLeft = newValue
+                    }
+                    options: [
+                        {
+                            displayName: Translation.tr("Left to right"),
+                            icon: "arrow_forward",
+                            value: 0
+                        },
+                        {
+                            displayName: Translation.tr("Right to left"),
+                            icon: "arrow_back",
+                            value: 1
+                        }
+                    ]
+                }
+                ConfigSelectionArray {
+                    Layout.leftMargin: 50
+                    currentValue: Config.options.overview.orderBottomUp
+                    onSelected: newValue => {
+                        Config.options.overview.orderBottomUp = newValue
+                    }
+                    options: [
+                        {
+                            displayName: Translation.tr("Top-down"),
+                            icon: "arrow_downward",
+                            value: 0
+                        },
+                        {
+                            displayName: Translation.tr("Bottom-up"),
+                            icon: "arrow_upward",
+                            value: 1
+                        }
+                    ]
                 }
             }
         }
-        ConfigRow {
-            uniform: true
+
+        ConfigSpinBox {
+            enabled: Config.options.overview.scrollingStyle.backgroundStyle === "dim"
+            icon: "backlight_low"
+            text: Translation.tr("Dim percentage")
+            value: Config.options.overview.scrollingStyle.dimPercentage
+            from: 0
+            to: 75
+            stepSize: 5
+            onValueChanged: {
+                Config.options.overview.scrollingStyle.dimPercentage = value;
+            }
+        }
+
+
+        ContentSubsection {
+            title: Translation.tr("Background style")
+            visible: Config.options.overview.style === "scrolling"
             ConfigSelectionArray {
-                currentValue: Config.options.overview.orderRightLeft
+                currentValue: Config.options.overview.scrollingStyle.backgroundStyle
                 onSelected: newValue => {
-                    Config.options.overview.orderRightLeft = newValue
+                    Config.options.overview.scrollingStyle.backgroundStyle = newValue
                 }
                 options: [
                     {
-                        displayName: Translation.tr("Left to right"),
-                        icon: "arrow_forward",
-                        value: 0
+                        displayName: Translation.tr("Blur"),
+                        icon: "blur_on",
+                        value: "blur"
                     },
                     {
-                        displayName: Translation.tr("Right to left"),
-                        icon: "arrow_back",
-                        value: 1
+                        displayName: Translation.tr("Dim"),
+                        icon: "ev_shadow",
+                        value: "dim"
+                    },
+                    {
+                        displayName: Translation.tr("Transparent"),
+                        icon: "opacity",
+                        value: "transparent"
                     }
                 ]
             }
-            ConfigSelectionArray {
-                currentValue: Config.options.overview.orderBottomUp
-                onSelected: newValue => {
-                    Config.options.overview.orderBottomUp = newValue
+        }
+
+
+
+        ContentSubsection {
+            title: Translation.tr("Hyprscrolling plugin implementation")
+
+            ConfigSwitch {
+                buttonIcon: "view_carousel"
+                text: Translation.tr("Use hyprscrolling implementation")
+                checked: Config.options.overview.hyprscrollingImplementation.enable
+                onCheckedChanged: {
+                    Config.options.overview.hyprscrollingImplementation.enable = checked;
                 }
-                options: [
-                    {
-                        displayName: Translation.tr("Top-down"),
-                        icon: "arrow_downward",
-                        value: 0
-                    },
-                    {
-                        displayName: Translation.tr("Bottom-up"),
-                        icon: "arrow_upward",
-                        value: 1
-                    }
-                ]
+            }
+        }
+
+        RowLayout {
+            Layout.topMargin: 10
+            StyledText {
+                property bool firstError: page.hyprscrollingPluginEnabled && !configEnabled
+                property bool secondError: !page.hyprscrollingPluginEnabled & configEnabled
+                property bool configEnabled: Config.options.overview.hyprscrollingImplementation.enable
+                Layout.leftMargin: 10
+                color: firstError || secondError ? Appearance.colors.colError : Appearance.colors.colSubtext
+                font.pixelSize: Appearance.font.pixelSize.smallie
+                text: firstError ? Translation.tr("Hyprscrolling plugin is installed. To ensure a better experience\nplease enable the ‘implementation’ option.") :
+                    secondError ? Translation.tr("Hyprscrolling plugin is not installed. To ensure a better experience\nplease disable the ‘implementation’ option.") :
+                    Translation.tr("Plese refer to documentation for more information about how to\nimplement hyprscrolling plugin to properly work with this shell")
+                    
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            RippleButtonWithIcon {
+                buttonRadius: Appearance.rounding.full
+                materialIcon: "open_in_new"
+                mainText: Translation.tr("Open docs")
+                onClicked: {
+                    Qt.openUrlExternally(`https://github.com/vaguesyntax/ii-vynx?tab=readme-ov-file#-hyprscrolling-implementation-`);
+                }
+                StyledToolTip {
+                    text: "github.com/vaguesyntax/ii-vynx"
+                }
             }
         }
     }
@@ -797,114 +1148,6 @@ ContentPage {
         }
     }
 
-    ContentSection {
-        icon: "text_format"
-        title: Translation.tr("Fonts")
-
-        ContentSubsection {
-            title: Translation.tr("Main font")
-            tooltip: Translation.tr("Used for general UI text")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name (e.g., Google Sans Flex)")
-                text: Config.options.appearance.fonts.main
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.main = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Numbers font")
-            tooltip: Translation.tr("Used for displaying numbers")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name")
-                text: Config.options.appearance.fonts.numbers
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.numbers = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Title font")
-            tooltip: Translation.tr("Used for headings and titles")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name")
-                text: Config.options.appearance.fonts.title
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.title = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Monospace font")
-            tooltip: Translation.tr("Used for code and terminal")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name (e.g., JetBrains Mono NF)")
-                text: Config.options.appearance.fonts.monospace
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.monospace = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Nerd font icons")
-            tooltip: Translation.tr("Font used for Nerd Font icons")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name (e.g., JetBrains Mono NF)")
-                text: Config.options.appearance.fonts.iconNerd
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.iconNerd = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Reading font")
-            tooltip: Translation.tr("Used for reading large blocks of text")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name (e.g., Readex Pro)")
-                text: Config.options.appearance.fonts.reading
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.reading = text;
-                }
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Expressive font")
-            tooltip: Translation.tr("Used for decorative/expressive text")
-
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Font family name (e.g., Space Grotesk)")
-                text: Config.options.appearance.fonts.expressive
-                wrapMode: TextEdit.NoWrap
-                onTextChanged: {
-                    Config.options.appearance.fonts.expressive = text;
-                }
-            }
-        }
-    }
+    
 
 }
